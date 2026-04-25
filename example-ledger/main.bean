@@ -1,0 +1,16 @@
+option "title" "Personal Ledger Example"
+option "operating_currency" "USD"
+
+2020-01-01 open Assets:Bank:Checking
+2020-01-01 open Assets:Cash
+2020-01-01 open Expenses:Food:Dining
+2020-01-01 open Expenses:Transport:Gas
+2020-01-01 open Income:Salary
+
+2026-01-01 * "Company" "Salary"
+  Assets:Bank:Checking        5000.00 USD
+  Income:Salary
+
+2026-04-25 * "Coffee Shop" "Bought a coffee"
+  Expenses:Food:Dining           5.00 USD
+  Assets:Bank:Checking          -5.00 USD

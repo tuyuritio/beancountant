@@ -1,0 +1,37 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	intent_router(intent_router)
+	bookkeeping(bookkeeping)
+	accounting(accounting)
+	other(other)
+	cleanup(cleanup)
+	analyzing(analyzing)
+	recording(recording)
+	retrieval(retrieval)
+	enquiring(enquiring)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> intent_router;
+	accounting -. &nbsp;tools&nbsp; .-> analyzing;
+	accounting -. &nbsp;__end__&nbsp; .-> cleanup;
+	analyzing --> accounting;
+	bookkeeping -. &nbsp;cancel&nbsp; .-> cleanup;
+	bookkeeping -. &nbsp;enquire&nbsp; .-> enquiring;
+	bookkeeping -. &nbsp;record&nbsp; .-> recording;
+	bookkeeping -. &nbsp;retrieve&nbsp; .-> retrieval;
+	enquiring --> bookkeeping;
+	intent_router -.-> accounting;
+	intent_router -.-> bookkeeping;
+	intent_router -.-> other;
+	other --> cleanup;
+	recording -. &nbsp;False&nbsp; .-> bookkeeping;
+	recording -. &nbsp;True&nbsp; .-> cleanup;
+	retrieval --> bookkeeping;
+	cleanup --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
