@@ -17,7 +17,7 @@ if not env.EMBEDDING_API_KEY or not env.EMBEDDING_MODEL:
         "[Launch] Lack of necessary environment variables for embedding model."
     )
 
-VECTOR_DB = "vector.db"
+VECTOR_DB = "./db/vector.db"
 
 connection = sqlite3.connect(VECTOR_DB, check_same_thread=False)
 connection.row_factory = sqlite3.Row

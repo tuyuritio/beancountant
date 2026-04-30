@@ -77,7 +77,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./example-ledger:/app/ledger
-      - ./vector.db:/app/vector.db
+      - ./db:/app/db
     env_file:
       - .env
 ```
@@ -111,6 +111,7 @@ Create a `.env` file in the same directory as your `docker-compose.yaml` with th
 | Mount Point | Description |
 |:- |:- |
 | `/app/ledger` | Ledger directory where Beancount files are stored. |
+| `/app/db` | Directory for the internal database. |
 
 ### Run
 
