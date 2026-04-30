@@ -10,6 +10,7 @@ from langgraph.types import interrupt
 from langchain.tools import tool
 
 import app.context as env
+from app.tools.retrieve import vector_store
 
 
 class Flag(StrEnum):
@@ -88,9 +89,7 @@ class CostSpec(BaseModel):
 
 
 class Posting(BaseModel):
-    account: str = Field(
-        ..., description="The account that is modified by this posting."
-    )
+    account: str = Field(..., description="The account that is modified by this posting.")
     units: Amount | None = Field(
         None,
         description="The amount and currency of the posting, formatted as '<amount> <currency>'. For example: '10 USD' or '-5 EUR'.",
@@ -114,17 +113,13 @@ class Posting(BaseModel):
 
 
 class Transaction(BaseModel):
-    date: datetime.date = Field(
-        ..., description="The date of the transaction in 'YYYY-MM-DD' format."
-    )
+    date: datetime.date = Field(..., description="The date of the transaction in 'YYYY-MM-DD' format.")
     flag: Flag = Field(
         Flag.PENDING,
         description="The transaction flag, either '*' for cleared or '!' for pending.",
     )
     payee: str | None = Field(None, description="The payee of the transaction.")
-    narration: str | None = Field(
-        None, description="The narration/description of the transaction."
-    )
+    narration: str | None = Field(None, description="The narration/description of the transaction.")
     tags: list[str] = Field(
         ...,
         description="A set of tags to associate with the transaction. Tags should be provided as a comma-separated string (e.g., 'tag1,tag2,tag3').",
@@ -144,24 +139,7 @@ class Transaction(BaseModel):
 
 
 class RecordArgs(BaseModel):
-    transactions: list[Transaction] = Field(
-        ..., description="A list of transactions to be recorded."
-    )
-
-
-def to_bean_cost(value: Cost | CostSpec | None) -> BeanCost | BeanCostSpec | None:
-    if value is None:
-        return None
-    if isinstance(value, Cost):
-        return BeanCost(value.number, value.currency, value.date, value.label)
-    return BeanCostSpec(
-        value.number_per,
-        value.number_total,
-        value.currency,
-        value.date,
-        value.label,
-        value.merge,
-    )
+    transactions: list[Transaction] = Field(..., description="A list of transactions to be recorded.")
 
 
 @tool(args_schema=RecordArgs)
@@ -196,9 +174,7 @@ def record(**kwargs):
         for transaction in args.transactions
     ]
 
-    entries = "\n".join(
-        printer.format_entry(transaction) for transaction in transactions
-    )
+    entries = "\n".join(printer.format_entry(transaction) for transaction in transactions)
 
     response = interrupt({"text": entries, "options": [["❌", "✔️"]]})
 
@@ -207,6 +183,38 @@ def record(**kwargs):
             with open(env.INDEX_LEDGER, "a", encoding="utf-8") as file:
                 file.write(entries)
                 file.write("\n")
+
+            data_set = []
+            for entry in args.transactions:
+                accounts = [posting.account for posting in entry.postings]
+                semantic_description = f"{entry.payee} | {entry.narration} | {', '.join(accounts)}"
+
+                data_set.append(
+                    {
+                        "text": semantic_description,
+                        "metadata": {
+                            "flag": entry.flag.value,
+                            "payee": entry.payee,
+                            "narration": entry.narration,
+                            "tags": entry.tags if entry.tags else None,
+                            "links": entry.links if entry.links else None,
+                            "postings": [
+                                {
+                                    "account": posting.account,
+                                    "units": str(posting.units.beanize()) if posting.units else None,
+                                    "cost": str(posting.cost.beanize()) if posting.cost else None,
+                                    "price": str(posting.price.beanize()) if posting.price else None,
+                                    "flag": posting.flag.value if posting.flag else None,
+                                }
+                                for posting in entry.postings
+                            ],
+                        },
+                    }
+                )
+
+            texts = [item["text"] for item in data_set]
+            metadatas = [item["metadata"] for item in data_set]
+            vector_store.add_texts(texts=texts, metadatas=metadatas)
 
             return True
 
