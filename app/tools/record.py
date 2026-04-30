@@ -178,7 +178,7 @@ def record(**kwargs):
 
     response = interrupt({"text": entries, "options": [["❌", "✔️"]]})
 
-    match response:
+    match response[0].get("text"):
         case "✔️":
             with open(env.INDEX_LEDGER, "a", encoding="utf-8") as file:
                 file.write(entries)

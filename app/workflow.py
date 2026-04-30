@@ -84,7 +84,7 @@ if os.getenv("ENV") == "dev":
 
 
 # Invoke
-def invoke(user_input: str, user_id: int):
+def invoke(user_input: str | list[str | dict], user_id: int):
     config: RunnableConfig = {"configurable": {"thread_id": str(user_id)}}
 
     snapshot = chain.get_state(config)

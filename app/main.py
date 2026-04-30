@@ -1,5 +1,7 @@
 import sys
+import io
 import logging
+import base64
 from telegram import (
     Update,
     Message,
@@ -47,19 +49,22 @@ async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ):
         return
 
+    user_input = []
+
     # Handle callback queries
     if update.callback_query:
         query = update.callback_query
         await query.answer()
-        user_input = query.data if query.data else ""
+        data = query.data if query.data else ""
+        user_input.append({"type": "text", "text": data})
 
         if isinstance(query.message, Message):
             original_text = query.message.text
-            reply_text = f"{original_text}\n\n✅ {user_input}"
+            reply_text = f"{original_text}\n\n✅ {data}"
             await query.edit_message_text(text=reply_text, reply_markup=None)
 
     # Handle regular messages
-    elif update.message and update.message.text:
+    elif update.message:
         last = context.user_data.get("last")
         if last and isinstance(last, int):
             try:
@@ -71,7 +76,20 @@ async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as e:
                 logging.error(f"Failed to edit message reply markup: {e}")
 
-        user_input = update.message.text
+        if update.message.text:
+            user_input.append({"type": "text", "text": update.message.text})
+
+        if update.message.photo:
+            photo = max(update.message.photo, key=lambda p: p.width * p.height)
+            file = await photo.get_file()
+
+            bytearray = io.BytesIO()
+            await file.download_to_memory(bytearray)
+            bytearray.seek(0)
+
+            image_base64 = base64.b64encode(bytearray.read()).decode("utf-8")
+
+            user_input.append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}})
 
     # Ignore non-text messages
     else:
@@ -112,7 +130,7 @@ if __name__ == "__main__":
 
     app.add_handler(CommandHandler("start", start_handler, filters=user_filter))
     app.add_handler(CommandHandler("embed", embed_handler, filters=user_filter))
-    app.add_handler(MessageHandler(filters.TEXT & user_filter, update_handler))
+    app.add_handler(MessageHandler(filters.TEXT | filters.PHOTO & user_filter, update_handler))
     app.add_handler(CallbackQueryHandler(update_handler, block=False))
 
     app.run_webhook(
