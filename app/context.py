@@ -11,9 +11,7 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 PORT = int(os.getenv("PORT", "8443"))
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
-ALLOWED_USERS = [
-    int(uid.strip()) for uid in os.getenv("ALLOWED_USERS", "").split(",") if uid.strip()
-]
+ALLOWED_USERS = [int(uid.strip()) for uid in os.getenv("ALLOWED_USERS", "").split(",") if uid.strip()]
 
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
 LLM_URL = os.getenv("LLM_URL")

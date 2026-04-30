@@ -13,9 +13,7 @@ from langchain_community.vectorstores import SQLiteVSS
 import app.context as env
 
 if not env.EMBEDDING_API_KEY or not env.EMBEDDING_MODEL:
-    raise ValueError(
-        "[Launch] Lack of necessary environment variables for embedding model."
-    )
+    raise ValueError("[Launch] Lack of necessary environment variables for embedding model.")
 
 VECTOR_DB = "./db/vector.db"
 

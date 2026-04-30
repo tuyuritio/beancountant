@@ -6,9 +6,7 @@ from langchain.tools import tool
 
 
 class ExchangeRateArgs(BaseModel):
-    base: str = Field(
-        ..., description="The base 3-letter ISO currency code (e.g., 'USD')."
-    )
+    base: str = Field(..., description="The base 3-letter ISO currency code (e.g., 'USD').")
     quotes: str | None = Field(
         None,
         description="Comma-separated target 3-letter ISO currency codes (e.g., 'EUR,GBP').",
@@ -36,9 +34,7 @@ def exchange_rate(**kwargs):
     if args.date:
         params["date"] = args.date
 
-    logging.info(
-        f"[Tool:exchange_rate] Fetching exchange rates with parameters: {params}"
-    )
+    logging.info(f"[Tool:exchange_rate] Fetching exchange rates with parameters: {params}")
 
     try:
         response = httpx.get(url, params=params)
@@ -46,9 +42,7 @@ def exchange_rate(**kwargs):
 
         result = json.dumps(response.json(), ensure_ascii=False)
 
-        logging.info(
-            f"[Tool:exchange_rate] Exchange rates fetched successfully. Response:\n{result}"
-        )
+        logging.info(f"[Tool:exchange_rate] Exchange rates fetched successfully. Response:\n{result}")
 
         return result
 

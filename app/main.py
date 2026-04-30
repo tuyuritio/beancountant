@@ -21,9 +21,7 @@ from app.workflow import invoke
 
 
 if not env.WEBHOOK_URL or not env.BOT_TOKEN:
-    raise ValueError(
-        "[Launch] Lack of necessary environment variables for Telegram bot."
-    )
+    raise ValueError("[Launch] Lack of necessary environment variables for Telegram bot.")
 
 
 # Configure logging
@@ -37,9 +35,7 @@ logging.basicConfig(
 
 async def start_handler(update: Update, _: ContextTypes.DEFAULT_TYPE):
     if update.message:
-        await update.message.reply_text(
-            "Welcome to Beancountant!\nSend me your financial queries or transactions."
-        )
+        await update.message.reply_text("Welcome to Beancountant!\nSend me your financial queries or transactions.")
 
 
 async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -91,13 +87,7 @@ async def update_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             options = [[option] for option in options]
 
         reply_markup = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton(text=option, callback_data=option)
-                    for option in row
-                ]
-                for row in options
-            ]
+            [[InlineKeyboardButton(text=option, callback_data=option) for option in row] for row in options]
         )
 
     # Send message

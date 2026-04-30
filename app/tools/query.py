@@ -102,13 +102,9 @@ def query(**kwargs) -> str:
 
     try:
         result = subprocess.run(command, capture_output=True, text=True, check=True)
-        logging.info(
-            f"[Tool:query] BQL query executed successfully. Output:\n{result.stdout}"
-        )
+        logging.info(f"[Tool:query] BQL query executed successfully. Output:\n{result.stdout}")
         return result.stdout
 
     except subprocess.CalledProcessError as e:
-        logging.error(
-            f"[Tool:query] BQL query execution failed with error:\n{e.stderr}"
-        )
+        logging.error(f"[Tool:query] BQL query execution failed with error:\n{e.stderr}")
         return e.stderr
