@@ -23,6 +23,7 @@ EMBEDDING_URL = os.getenv("EMBEDDING_URL")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 EMBEDDING_API_KEY = os.getenv("EMBEDDING_API_KEY")
 
+TIMEZONE = os.getenv("TIMEZONE", "UTC")
 MAIN_LEDGER = os.getenv("MAIN_LEDGER", "./ledger/main.bean")
 INDEX_LEDGER = os.getenv("INDEX_LEDGER", "./ledger/main.bean")
 

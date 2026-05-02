@@ -1,23 +1,23 @@
 import logging
-from datetime import datetime, timezone
-from langgraph.graph import MessagesState
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from langchain.messages import SystemMessage
 from langchain.chat_models import init_chat_model
 
-import app.context as env
+import app.context as context
 from app.tools import query, exchange_rate
 
 
 model = init_chat_model(
-    model_provider=env.LLM_PROVIDER,
-    base_url=env.LLM_URL,
-    model=env.LLM_MODEL,
-    api_key=env.LLM_API_KEY,
+    model_provider=context.LLM_PROVIDER,
+    base_url=context.LLM_URL,
+    model=context.LLM_MODEL,
+    api_key=context.LLM_API_KEY,
     temperature=0,
 ).bind_tools([query, exchange_rate])
 
 
-SYSTEM_PROMPT = f"""
+SYSTEM_PROMPT = """
 Role
 You are an expert personal accountant and Beancount ledger assistant.
 Your job is to help the user manage the personal finances by analyzing the existing ledger and providing insights, summaries, and suggestions based on the user's financial data.
@@ -34,11 +34,13 @@ Constraints
 - NEVER use emoji, markdown or any other formatting.
 
 Context
-Current Time: {datetime.now(timezone.utc)}; You must dynamically resolve "today", "yesterday", etc.
+Current Time: {current_time}; You must dynamically resolve "today", "yesterday", etc.
 """
 
 
-def accounting(state: MessagesState):
-    message = model.invoke([SystemMessage(SYSTEM_PROMPT)] + state["messages"])
+def accounting(state: context.State):
+    prompt = SYSTEM_PROMPT.format(current_time=datetime.now(ZoneInfo(context.TIMEZONE)))
+    message = model.invoke([SystemMessage(prompt)] + state["messages"])
+
     logging.info(f"[Accounting] {message}")
     return {"messages": [message]}

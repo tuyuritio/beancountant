@@ -1,6 +1,7 @@
 import logging
 from pydantic import BaseModel, Field
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from langchain.messages import SystemMessage
 from langchain.chat_models import init_chat_model
 
@@ -34,13 +35,10 @@ model = init_chat_model(
 ).bind_tools([enquiring_message, retrieve, record])
 
 
-SYSTEM_PROMPT = f"""
+SYSTEM_PROMPT = """
 Role
 You are an expert personal accountant assistant for bookkeeping.
 Your job is to help the user manage the personal finances by accurately adding new transaction records.
-
-Context
-Current Time: {datetime.now(timezone.utc)}; You must dynamically resolve "today", "yesterday", etc.
 
 Goal
 When the user states they spent/earned money, you MUST:
@@ -55,19 +53,25 @@ Constraints
 - Use ONLY the following Telegram-compatible HTML tags in your text: <b>, <i>, <u>, <s>, <code>, <pre>, and <a>.
 - NEVER use emoji, markdown or any other formatting.
 
-Accounts
-Use the following accounts for bookkeeping:
-{
-    query.invoke(
-        {
-            "bql": "SELECT DISTINCT account, open_meta(account, 'alias') as alias FROM accounts WHERE account ~ 'Expenses|Income|Assets|Liabilities'"
-        }
-    )
-}
+Context
+Current Time: {current_time}; You must dynamically resolve "today", "yesterday", etc.
+
+Accounts:
+{accounts}
 """
 
 
 def bookkeeping(state: context.State):
-    message = model.invoke([SystemMessage(SYSTEM_PROMPT)] + state["messages"])
+    prompt = SYSTEM_PROMPT.format(
+        current_time=datetime.now(ZoneInfo(context.TIMEZONE)),
+        accounts=query.invoke(
+            {
+                "bql": "SELECT DISTINCT account, open_meta(account, 'alias') as alias FROM accounts WHERE account ~ 'Expenses|Income|Assets|Liabilities'"
+            }
+        ),
+    )
+
+    message = model.invoke([SystemMessage(prompt)] + state["messages"])
+
     logging.info(f"[Bookkeeping] {message}")
     return {"messages": [message]}

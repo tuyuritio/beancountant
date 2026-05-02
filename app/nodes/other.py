@@ -1,6 +1,6 @@
-from langgraph.graph import MessagesState
 from langchain.messages import AIMessage
 
+from app.context import State
 
-def other(state: MessagesState):
+def other(state: State):
     state["messages"].append(AIMessage("Fine."))

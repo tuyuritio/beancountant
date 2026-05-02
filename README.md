@@ -101,6 +101,7 @@ Create a `.env` file in the same directory as your `docker-compose.yaml` with th
 | `EMBEDDING_URL`* | Embedding API base URL | - |
 | `EMBEDDING_MODEL`* | The embedding model name to use for vector search | - |
 | `EMBEDDING_API_KEY`* | API key for the embedding model | - |
+| `TIMEZONE` | IANA Timezone for timestamping transactions | `UTC` |
 | `MAIN_LEDGER` | Path to the main Beancount ledger file | `./ledger/main.bean` |
 | `INDEX_LEDGER` | Path to the index ledger file used for bookkeeping | `./ledger/main.bean` |
 
