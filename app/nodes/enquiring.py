@@ -17,7 +17,7 @@ def enquiring(state: State):
         return {
             "messages": [
                 ToolMessage(
-                    response,
+                    content=response,
                     tool_call_id=tool["id"],
                 )
             ]

@@ -38,6 +38,8 @@ vector_store = SQLiteVSS(
     table="beancountant_vectors",
 )
 
+DESCRIPTION_TEMPLATE = "{payee} | {narration}"
+
 
 def initialize_embeddings():
     data_set = []
@@ -47,8 +49,7 @@ def initialize_embeddings():
         if isinstance(entry, data.Transaction):
             payee = entry.payee if entry.payee else ""
             narration = entry.narration if entry.narration else ""
-            accounts = [p.account.replace(":", " ") for p in entry.postings]
-            semantic_description = f"{payee} | {narration} | {', '.join(accounts)}"
+            semantic_description = DESCRIPTION_TEMPLATE.format(payee=payee, narration=narration)
 
             data_set.append(
                 {
@@ -92,25 +93,34 @@ def initialize_embeddings():
 
 
 class RAGArgs(BaseModel):
-    text: str = Field(
-        ...,
-        description="The input text to retrieve relevant transactions for.",
+    """
+    Args for the `retrieve` tool.
+    You MUST provide extracting information for EITHER `payee` OR `narration` (or both) to form a valid similarity search query. Do NOT output empty values for both.
+    """
+
+    payee: str | None = Field(
+        None,
+        description="The exact name of the payee in the transaction. Extract verbatim. If absolutely no payee is identifiable in the context, output exactly null.",
     )
-    k: int = Field(
-        5,
-        description="The number of relevant transactions to retrieve.",
+    narration: str | None = Field(
+        None,
+        description="The transaction description, purpose, or note. If present, extract it. If absent, output exactly null.",
     )
 
 
 @tool(args_schema=RAGArgs)
 def retrieve(**kwargs):
     """
-    Retrieves relevant transactions from the Beancount ledger based on the input text.
+    Retrieves historical Beancount entries to align the pending transaction with established Account, Payee, Narration, Tag/Link patterns, and to ensure consistency with the user's financial history and habits.
+    This tool provides the Ground Truth for personal accounting logic that cannot be inferred through general knowledge.
     """
 
     args = RAGArgs(**kwargs)
 
-    similarities = vector_store.similarity_search(args.text, k=5)
+    similarities = vector_store.similarity_search(
+        query=DESCRIPTION_TEMPLATE.format(payee=args.payee or "", narration=args.narration or ""),
+        k=5,
+    )
 
     results = []
     for similarity in similarities:
@@ -126,4 +136,5 @@ def retrieve(**kwargs):
             }
         )
 
+    logging.info(f"[Retrieve] Retrieved {len(results)} similar entries: {results}")
     return results

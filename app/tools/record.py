@@ -10,7 +10,7 @@ from langgraph.types import interrupt
 from langchain.tools import tool
 
 import app.context as env
-from app.tools.retrieve import vector_store
+from app.tools.retrieve import vector_store, DESCRIPTION_TEMPLATE
 
 
 class Flag(StrEnum):
@@ -186,12 +186,9 @@ def record(**kwargs):
 
             data_set = []
             for entry in args.transactions:
-                accounts = [posting.account for posting in entry.postings]
-                semantic_description = f"{entry.payee} | {entry.narration} | {', '.join(accounts)}"
-
                 data_set.append(
                     {
-                        "text": semantic_description,
+                        "text": DESCRIPTION_TEMPLATE.format(payee=entry.payee or "", narration=entry.narration or ""),
                         "metadata": {
                             "flag": entry.flag.value,
                             "payee": entry.payee,
