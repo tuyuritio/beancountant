@@ -103,7 +103,7 @@ Create a `.env` file in the same directory as your `docker-compose.yaml` with th
 | `EMBEDDING_API_KEY`* | API key for the embedding model | - |
 | `TIMEZONE` | IANA Timezone for timestamping transactions | `UTC` |
 | `MAIN_LEDGER` | Path to the main Beancount ledger file | `./ledger/main.bean` |
-| `INDEX_LEDGER` | Path to the index ledger file used for bookkeeping | `./ledger/main.bean` |
+| `INBOX_LEDGER` | Path to the inbox ledger file used for bookkeeping | `./ledger/main.bean` |
 
 > Variables marked with `*` are required.
 

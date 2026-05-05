@@ -180,7 +180,7 @@ def record(**kwargs):
 
     match response[0].get("text"):
         case "✔️":
-            with open(env.INDEX_LEDGER, "a", encoding="utf-8") as file:
+            with open(env.INBOX_LEDGER, "a", encoding="utf-8") as file:
                 file.write(entries)
                 file.write("\n")
 

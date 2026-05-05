@@ -25,7 +25,7 @@ EMBEDDING_API_KEY = os.getenv("EMBEDDING_API_KEY")
 
 TIMEZONE = os.getenv("TIMEZONE", "UTC")
 MAIN_LEDGER = os.getenv("MAIN_LEDGER", "./ledger/main.bean")
-INDEX_LEDGER = os.getenv("INDEX_LEDGER", "./ledger/main.bean")
+INBOX_LEDGER = os.getenv("INBOX_LEDGER", "./ledger/main.bean")
 
 
 class State(MessagesState):
