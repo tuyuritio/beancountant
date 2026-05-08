@@ -66,22 +66,6 @@ graph TD;
 
 ## Getting Started
 
-Create a `docker-compose.yaml` file:
-
-```yaml
-version: '3.8'
-services:
-  beancountant:
-    image: ghcr.io/tuyuritio/beancountant:dev
-    container_name: beancountant
-    restart: unless-stopped
-    volumes:
-      - ./example-ledger:/app/ledger
-      - ./db:/app/db
-    env_file:
-      - .env
-```
-
 ### Environment Variables
 
 Create a `.env` file in the same directory as your `docker-compose.yaml` with the following content:
@@ -109,18 +93,72 @@ Create a `.env` file in the same directory as your `docker-compose.yaml` with th
 
 ### Volumes
 
+Create the necessary directories and database file:
+
+```sh
+mkdir -p ledger data
+```
+
+> Don't forget to place your initial Beancount ledger files in the `ledger` directory.
+
 | Mount Point | Description |
 |:- |:- |
 | `/app/ledger` | Ledger directory where Beancount files are stored. |
-| `/app/db` | Directory for the internal database. |
+| `/app/data` | Directory for the runtime data. |
 
 ### Run
+
+### Docker Run
+
+Run the container directly with `docker run`:
+
+```sh
+docker run -d \
+  --name beancountant \
+  --restart unless-stopped \
+  -v $(pwd)/ledger:/app/ledger \
+  -v $(pwd)/data:/app/data \
+  --env-file .env \
+  ghcr.io/tuyuritio/beancountant:dev
+```
+
+### Docker Compose
+
+Create a `docker-compose.yaml` file like:
+
+```yaml
+version: '3.8'
+services:
+  beancountant:
+    image: ghcr.io/tuyuritio/beancountant:dev
+    container_name: beancountant
+    restart: unless-stopped
+    volumes:
+      - ./example-ledger:/app/ledger
+      - ./data:/app/data
+    env_file:
+      - .env
+```
+
+Then start the container:
 
 ```sh
 docker compose up -d
 ```
 
-Then send a message to your Telegram bot (e.g., *"I spent $20 on gas"*).
+### Build from Source
+
+Build the image from source using the provided `Dockerfile`:
+
+```sh
+docker build -t <IMAGE_NAME>:<TAG> .
+```
+
+Then run the container with the same `docker run` command as above.
+
+---
+
+Now you can send a message to your Telegram bot (e.g., *"I spent $20 on gas"*)!
 
 ## Contributing
 
