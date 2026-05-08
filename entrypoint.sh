@@ -1,8 +1,19 @@
 #!/bin/bash
 set -e
 
-# Ensure the ledger and db directories have the correct ownership
-chown -R appuser:appuser /app/ledger /app/db
+TARGET_DIR="/app/ledger"
+MOUNT_UID=$(stat -c '%u' "$TARGET_DIR")
+MOUNT_GID=$(stat -c '%g' "$TARGET_DIR")
 
-# Execute the command as the non-root user
-exec gosu appuser "$@"
+if [ "$MOUNT_UID" = "0" ]; then
+    exec "$@"
+else
+    if ! getent group "$MOUNT_GID" > /dev/null 2>&1; then
+        groupadd -g "$MOUNT_GID" appgroup
+    fi
+    if ! id -u "$MOUNT_UID" > /dev/null 2>&1; then
+        useradd -r -u "$MOUNT_UID" -g "$MOUNT_GID" -m appuser
+    fi
+
+    exec setpriv --reuid="$MOUNT_UID" --regid="$MOUNT_GID" --init-groups "$@"
+fi
