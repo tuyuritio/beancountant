@@ -16,6 +16,15 @@ dependencies = [
     "sqlite-vss>=0.1.2",
 ]
 
+[tool.semantic_release]
+branch = "main"
+allow_zero_version = true
+major_on_zero = false
+upload_to_vcs_release = true
+version_toml = ["pyproject.toml:project.version"]
+commit_message = "chore(release): {version}"
+build_command = "python -m pip install uv && uv lock && git add uv.lock"
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
