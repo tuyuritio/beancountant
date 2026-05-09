@@ -8,6 +8,7 @@ load_dotenv()
 ENV = os.getenv("ENV", "prod").lower()
 
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+URL_PATH = os.getenv("URL_PATH", "")
 PORT = int(os.getenv("PORT", "8443"))
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")

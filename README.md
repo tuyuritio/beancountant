@@ -73,6 +73,7 @@ Create a `.env` file in the same directory as your `docker-compose.yaml` with th
 | Variable | Description | Default |
 |:- |:- |:- |
 | `WEBHOOK_URL`* | Telegram bot webhook URL | - |
+| `URL_PATH` | Path inside url for the webhook | `""` |
 | `PORT` | Port for the Telegram bot webhook (Only `443`, `80`, `88`, `8443` are allowed) | `8443` |
 | `BOT_TOKEN`* | Telegram Bot API Token from [BotFather](https://t.me/BotFather) | - |
 | `SECRET_TOKEN` | Telegram webhook secret token for security | - |

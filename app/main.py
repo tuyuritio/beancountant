@@ -137,5 +137,6 @@ if __name__ == "__main__":
         listen="0.0.0.0",
         port=env.PORT,
         webhook_url=env.WEBHOOK_URL,
+        url_path=env.URL_PATH,
         secret_token=env.SECRET_TOKEN,
     )
