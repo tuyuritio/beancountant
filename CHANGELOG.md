@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v0.1.2 (2026-05-11)
+
+### Bug Fixes
+
+- Update vector store references from sqlite-vss to sqlite-vec
+  ([`b479898`](https://github.com/tuyuritio/beancountant/commit/b47989818ab8a9bf860657db8a25bbe93dbc5d49))
+
+
 ## v0.1.1 (2026-05-09)
 
 ### Bug Fixes
