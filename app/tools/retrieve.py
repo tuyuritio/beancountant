@@ -3,12 +3,12 @@ from pydantic import BaseModel, Field
 from itertools import batched
 import time
 import sqlite3
-import sqlite_vss
+import sqlite_vec
 from beancount import loader
 from beancount.core import data
 from langchain.tools import tool
 from langchain.embeddings import init_embeddings
-from langchain_community.vectorstores import SQLiteVSS
+from langchain_community.vectorstores import SQLiteVec
 
 import app.context as env
 
@@ -20,7 +20,7 @@ VECTOR_DB = "./data/vector.db"
 connection = sqlite3.connect(VECTOR_DB, check_same_thread=False)
 connection.row_factory = sqlite3.Row
 connection.enable_load_extension(True)
-sqlite_vss.load(connection)
+sqlite_vec.load(connection)
 
 embeddings = init_embeddings(
     provider=env.EMBEDDING_PROVIDER,
@@ -31,7 +31,7 @@ embeddings = init_embeddings(
     check_embedding_ctx_length=False,
 )
 
-vector_store = SQLiteVSS(
+vector_store = SQLiteVec(
     embedding=embeddings,
     connection=connection,
     db_file=VECTOR_DB,
