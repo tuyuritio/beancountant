@@ -18,7 +18,8 @@ class enquiring_message(BaseModel):
 
     text: str = Field(
         ...,
-        description="The message text to send to the user, prompting them for information or confirmation.",
+        min_length=1,
+        description="The message text to send to the user, prompting them for information or confirmation. Must be a NON-empty and NON-blank string.",
     )
     options: list[str] | None = Field(
         None,
